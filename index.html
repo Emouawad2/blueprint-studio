@@ -15,7 +15,7 @@
 <style>
   :root{
     --indigo:#153A8A; --indigo-deep:#0d2559; --cyan:#37B6E9; --paper:#F3F1EA; --ink:#0F1522;
-    --amber:#FFB020; --line:#dee2ea; --mute:#5b6472; --white:#fff;
+    --amber:#FFB020; --line:#dee2ea; --mute:#5b6472; --white:#fff; --sy:104px;
     --disp:'Space Grotesk',system-ui,sans-serif; --mono:'Space Mono',ui-monospace,monospace; --body:'Inter',system-ui,sans-serif;
   }
   *{margin:0;padding:0;box-sizing:border-box}
@@ -71,7 +71,10 @@
   .dim-div{display:flex;align-items:center;gap:14px;color:var(--mute);font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;margin:0}
   .dim-div::before,.dim-div::after{content:"";height:1px;background:var(--line);flex:1}
 
-  section{padding:84px 0}
+  /* one consistent vertical rhythm — section.wrap beats .wrap's padding so it can't collapse */
+  .hero{padding:0}
+  section.wrap{padding-top:var(--sy)}
+  #inquire{padding-bottom:var(--sy)}
   .sheet{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--indigo);margin-bottom:14px;display:block}
   .sec-h{font-size:clamp(1.8rem,4vw,2.7rem);max-width:20ch;margin-bottom:16px}
   .sec-lead{color:var(--mute);max-width:56ch;font-size:1.05rem}
@@ -149,6 +152,7 @@
   .reveal.in{opacity:1;transform:none}
   @media (prefers-reduced-motion:reduce){*{transition:none!important}.reveal{opacity:1;transform:none}}
   @media(max-width:920px){
+    :root{--sy:66px}
     .svc,.why-grid,.work,.proc{grid-template-columns:1fr}
     .step{border-right:0;border-bottom:1px solid var(--line)}.step:last-child{border-bottom:0}
     .inq{grid-template-columns:1fr}.why{padding:34px}
@@ -194,10 +198,8 @@
   </div>
 </section>
 
-<div class="wrap"><p class="dim-div" style="margin-top:46px">what we build</p></div>
-
 <!-- SERVICES -->
-<section class="wrap" id="services" style="padding-top:40px">
+<section class="wrap" id="services">
   <div class="reveal">
     <span class="sheet">Sheet 01 — Services</span>
     <h2 class="sec-h">Three things, done end-to-end.</h2>
