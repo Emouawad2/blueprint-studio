@@ -93,6 +93,45 @@
   .card li .ic{width:18px;height:18px;color:var(--ink);margin-top:3px}
   .card .tag{position:absolute;top:20px;right:20px;font-family:var(--mono);font-size:.64rem;color:var(--mute)}
 
+  /* services — immersive showcase */
+  .showcase{display:grid;grid-template-columns:1.05fr .95fr;margin-top:44px;border:1px solid var(--line);border-radius:16px;overflow:hidden;min-height:74vh}
+  .viz-wrap{position:relative;background:var(--indigo-deep);overflow:hidden;display:grid;place-items:center;min-height:340px}
+  .viz-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:28px 28px}
+  .viz{position:absolute;inset:0;display:grid;place-items:center;opacity:0;visibility:hidden;transition:opacity .5s ease}
+  .viz.active{opacity:1;visibility:visible}
+  .viz svg{width:80%;max-width:460px}
+  .copy-wrap{padding:52px;display:flex;flex-direction:column;justify-content:center;position:relative;background:var(--white)}
+  .scount{font-family:var(--mono);color:var(--mute);font-size:.82rem;letter-spacing:.06em;margin-bottom:22px}
+  .scount #sIdx{color:var(--ink);font-weight:700}
+  .scopy{position:absolute;left:52px;right:52px;opacity:0;visibility:hidden;transform:translateY(16px);transition:opacity .5s ease,transform .5s ease}
+  .scopy.active{position:relative;opacity:1;visibility:visible;transform:none}
+  .sico{width:54px;height:54px;border-radius:13px;background:#ececea;color:var(--ink);display:grid;place-items:center;margin-bottom:20px}
+  .sico .ic{width:28px;height:28px}
+  .scopy h3{font-size:clamp(1.5rem,3vw,2rem);margin-bottom:12px}
+  .scopy p{color:var(--mute);margin-bottom:20px;max-width:44ch}
+  .scopy ul{list-style:none;display:grid;gap:11px}
+  .scopy li{display:flex;gap:11px;align-items:flex-start;font-size:.96rem}
+  .scopy li .ic{width:19px;height:19px;color:var(--amber);margin-top:3px}
+  .controls{display:flex;align-items:center;gap:18px;margin-top:38px}
+  .sarrow{width:46px;height:46px;border-radius:50%;border:1.5px solid var(--line);background:#fff;display:grid;place-items:center;cursor:pointer;color:var(--ink);transition:.2s}
+  .sarrow:hover{border-color:var(--ink);background:var(--ink);color:#fff}
+  .dots{display:flex;gap:8px}
+  .dots .dot{width:9px;height:9px;border-radius:50%;border:0;background:var(--line);cursor:pointer;padding:0;transition:.25s}
+  .dots .dot.on{background:var(--amber);width:26px;border-radius:5px}
+  /* draw-in animations, retrigger each time a card becomes active */
+  .viz .d{stroke-dasharray:760;stroke-dashoffset:760}
+  .viz.active .d{stroke-dashoffset:0;transition:stroke-dashoffset 1.2s ease var(--d,0s)}
+  .viz .bar{opacity:0}
+  .viz.active .bar{opacity:1;transition:opacity .6s ease var(--d,0s)}
+  .viz .grow{opacity:0}
+  .viz.active .grow{transform-box:fill-box;transform-origin:bottom;animation:grow .7s ease var(--d,.5s) both}
+  @keyframes grow{from{opacity:0;transform:scaleY(0)}to{opacity:1;transform:scaleY(1)}}
+  .viz .blink{opacity:.25}
+  .viz.active .blink{animation:blink 1.7s ease-in-out infinite}
+  @keyframes blink{0%,100%{opacity:.25}50%{opacity:1}}
+  .viz.active .pulse{animation:pulsering 2.1s ease-out infinite}
+  @keyframes pulsering{0%{opacity:.7;r:6px}100%{opacity:0;r:36px}}
+
   /* process */
   .proc{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:44px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--white)}
   .step{padding:34px 28px;border-right:1px solid var(--line);position:relative}
@@ -151,10 +190,11 @@
 
   .reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
   .reveal.in{opacity:1;transform:none}
-  @media (prefers-reduced-motion:reduce){*{transition:none!important}.reveal{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.reveal{opacity:1;transform:none}.viz .d{stroke-dashoffset:0}.viz .bar,.viz .grow{opacity:1}}
   @media(max-width:920px){
     :root{--sy:66px}
     .svc,.why-grid,.work,.proc{grid-template-columns:1fr}
+    .showcase{grid-template-columns:1fr;min-height:0}.viz-wrap{min-height:300px}.copy-wrap{padding:32px}.scopy{left:32px;right:32px}
     .step{border-right:0;border-bottom:1px solid var(--line)}.step:last-child{border-bottom:0}
     .inq{grid-template-columns:1fr}.why{padding:34px}
     .nav-links{display:none}.burger{display:flex}
@@ -205,20 +245,72 @@
   <div class="reveal">
     <span class="sheet">Sheet 01 — Services</span>
     <h2 class="sec-h">Three things, done end-to-end.</h2>
-    <p class="sec-lead">Pick what you need. We handle the design, the build, the hosting, and every change after.</p>
   </div>
-  <div class="svc reveal">
-    <div class="card"><span class="tag">01</span><div class="ico"><svg class="ic"><use href="#i-web"/></svg></div>
-      <h3>Website rebuilds</h3><p>Turn a dated or missing site into a fast, modern, mobile-first one that looks as good as your work.</p>
-      <ul><li><svg class="ic"><use href="#i-check"/></svg>Mobile-first &amp; fast</li><li><svg class="ic"><use href="#i-check"/></svg>WhatsApp/lead capture built in</li><li><svg class="ic"><use href="#i-check"/></svg>Bilingual / RTL if needed</li></ul>
+  <div class="showcase reveal" id="showcase">
+    <div class="viz-wrap"><div class="viz-grid"></div>
+      <div class="viz active" data-v="0"><svg viewBox="0 0 400 280" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <rect class="d" x="46" y="40" width="308" height="200" rx="9" stroke="#e9eae6" stroke-width="2"/>
+        <line class="d" x1="46" y1="74" x2="354" y2="74" stroke="#5b6472" stroke-width="1.5" style="--d:.15s"/>
+        <circle class="blink" cx="64" cy="57" r="3.5" fill="#FFB020"/><circle cx="76" cy="57" r="3.5" fill="#5b6472"/><circle cx="88" cy="57" r="3.5" fill="#5b6472"/>
+        <rect class="d" x="120" y="51" width="170" height="12" rx="6" stroke="#5b6472" style="--d:.25s"/>
+        <rect class="bar" x="66" y="94" width="128" height="66" rx="5" fill="rgba(255,176,32,.12)" stroke="#FFB020" style="--d:.45s"/>
+        <line class="d" x1="214" y1="100" x2="336" y2="100" stroke="#e9eae6" stroke-width="2" style="--d:.55s"/>
+        <line class="d" x1="214" y1="116" x2="318" y2="116" stroke="#5b6472" style="--d:.65s"/>
+        <line class="d" x1="214" y1="132" x2="330" y2="132" stroke="#5b6472" style="--d:.75s"/>
+        <rect class="bar" x="66" y="176" width="84" height="46" rx="5" stroke="#e9eae6" style="--d:.9s"/>
+        <rect class="bar" x="160" y="176" width="84" height="46" rx="5" stroke="#e9eae6" style="--d:1s"/>
+        <rect class="bar" x="254" y="176" width="82" height="46" rx="5" stroke="#e9eae6" style="--d:1.1s"/>
+      </svg></div>
+      <div class="viz" data-v="1"><svg viewBox="0 0 400 280" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <rect class="d" x="46" y="40" width="308" height="200" rx="9" stroke="#e9eae6" stroke-width="2"/>
+        <line class="d" x1="120" y1="40" x2="120" y2="240" stroke="#5b6472" style="--d:.15s"/>
+        <rect class="bar" x="140" y="60" width="62" height="34" rx="5" stroke="#FFB020" style="--d:.3s"/>
+        <rect class="bar" x="212" y="60" width="62" height="34" rx="5" stroke="#e9eae6" style="--d:.4s"/>
+        <rect class="bar" x="284" y="60" width="62" height="34" rx="5" stroke="#e9eae6" style="--d:.5s"/>
+        <rect class="grow" x="150" y="130" width="22" height="80" fill="#FFB020"/>
+        <rect class="grow" x="184" y="150" width="22" height="60" fill="rgba(255,176,32,.45)"/>
+        <rect class="grow" x="218" y="118" width="22" height="92" fill="#FFB020"/>
+        <rect class="grow" x="252" y="162" width="22" height="48" fill="rgba(255,176,32,.45)"/>
+        <path class="d" d="M300 200 L316 172 L332 184 L348 148" stroke="#e9eae6" stroke-width="2.5" style="--d:1s"/>
+      </svg></div>
+      <div class="viz" data-v="2"><svg viewBox="0 0 400 280" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <rect class="d" x="130" y="52" width="140" height="38" rx="7" stroke="#e9eae6" stroke-width="2"/>
+        <rect class="d" x="130" y="98" width="140" height="38" rx="7" stroke="#e9eae6" stroke-width="2" style="--d:.18s"/>
+        <rect class="d" x="130" y="144" width="140" height="38" rx="7" stroke="#e9eae6" stroke-width="2" style="--d:.36s"/>
+        <circle class="blink" cx="150" cy="71" r="4" fill="#FFB020"/>
+        <circle class="blink" cx="150" cy="117" r="4" fill="#FFB020" style="animation-delay:.5s"/>
+        <circle class="blink" cx="150" cy="163" r="4" fill="#FFB020" style="animation-delay:1s"/>
+        <line class="d" x1="240" y1="71" x2="300" y2="71" stroke="#5b6472" style="--d:.5s"/>
+        <line class="d" x1="240" y1="117" x2="300" y2="117" stroke="#5b6472" style="--d:.6s"/>
+        <path class="d" d="M60 226 L134 226 L152 202 L172 244 L192 226 L340 226" stroke="#FFB020" stroke-width="2.5" style="--d:.7s"/>
+        <circle class="pulse" cx="200" cy="117" r="6" fill="none" stroke="#FFB020" stroke-width="2"/>
+      </svg></div>
     </div>
-    <div class="card"><span class="tag">02</span><div class="ico"><svg class="ic"><use href="#i-dash"/></svg></div>
-      <h3>Internal dashboards</h3><p>Custom dashboards and tools to run your business — orders, bookings, inventory, reporting — in your browser.</p>
-      <ul><li><svg class="ic"><use href="#i-check"/></svg>Built around your workflow</li><li><svg class="ic"><use href="#i-check"/></svg>Secure logins</li><li><svg class="ic"><use href="#i-check"/></svg>Connects to your data</li></ul>
-    </div>
-    <div class="card"><span class="tag">03</span><div class="ico"><svg class="ic"><use href="#i-host"/></svg></div>
-      <h3>Hosting &amp; care</h3><p>We host it on your own domain and keep it running — updates, tweaks, and support, all on a simple monthly plan.</p>
-      <ul><li><svg class="ic"><use href="#i-check"/></svg>Your domain, we manage it</li><li><svg class="ic"><use href="#i-check"/></svg>Unlimited small changes</li><li><svg class="ic"><use href="#i-check"/></svg>Cancel anytime</li></ul>
+    <div class="copy-wrap">
+      <div class="scount"><span id="sIdx">01</span> / 03</div>
+      <div class="scopy active" data-c="0">
+        <div class="sico"><svg class="ic"><use href="#i-web"/></svg></div>
+        <h3>Website rebuilds</h3>
+        <p>Turn a dated or missing site into a fast, modern, mobile-first one that looks as good as your work.</p>
+        <ul><li><svg class="ic"><use href="#i-check"/></svg>Mobile-first &amp; fast</li><li><svg class="ic"><use href="#i-check"/></svg>WhatsApp / lead capture built in</li><li><svg class="ic"><use href="#i-check"/></svg>Bilingual / RTL if needed</li></ul>
+      </div>
+      <div class="scopy" data-c="1">
+        <div class="sico"><svg class="ic"><use href="#i-dash"/></svg></div>
+        <h3>Internal dashboards</h3>
+        <p>Custom dashboards and tools to run your business — orders, bookings, inventory, reporting — right in your browser.</p>
+        <ul><li><svg class="ic"><use href="#i-check"/></svg>Built around your workflow</li><li><svg class="ic"><use href="#i-check"/></svg>Secure logins</li><li><svg class="ic"><use href="#i-check"/></svg>Connects to your data</li></ul>
+      </div>
+      <div class="scopy" data-c="2">
+        <div class="sico"><svg class="ic"><use href="#i-host"/></svg></div>
+        <h3>Hosting &amp; care</h3>
+        <p>We host it on your own domain and keep it running — updates, tweaks, and support, all on a simple monthly plan.</p>
+        <ul><li><svg class="ic"><use href="#i-check"/></svg>Your domain, we manage it</li><li><svg class="ic"><use href="#i-check"/></svg>Unlimited small changes</li><li><svg class="ic"><use href="#i-check"/></svg>Cancel anytime</li></ul>
+      </div>
+      <div class="controls">
+        <button class="sarrow" id="sPrev" aria-label="Previous service"><svg class="ic" style="transform:rotate(180deg)"><use href="#i-chev"/></svg></button>
+        <div class="dots"><button class="dot on" data-i="0" aria-label="Service 1"></button><button class="dot" data-i="1" aria-label="Service 2"></button><button class="dot" data-i="2" aria-label="Service 3"></button></div>
+        <button class="sarrow" id="sNext" aria-label="Next service"><svg class="ic"><use href="#i-chev"/></svg></button>
+      </div>
     </div>
   </div>
 </section>
@@ -373,6 +465,25 @@ function submitInquiry(e){
   window.location.href = `mailto:${BP.email}?subject=${encodeURIComponent('New inquiry — '+d.business)}&body=${encodeURIComponent(body)}`;
   return false;
 }
+
+/* ---------- services showcase: auto-advance + manual, plays in view ---------- */
+(function(){
+  const sc=document.getElementById('showcase'); if(!sc) return;
+  const vz=[...sc.querySelectorAll('.viz')], cp=[...sc.querySelectorAll('.scopy')], dots=[...sc.querySelectorAll('.dots .dot')];
+  const RM=matchMedia('(prefers-reduced-motion:reduce)').matches; let i=0, timer=0, live=false;
+  function show(n){ i=(n+vz.length)%vz.length;
+    vz.forEach((v,k)=>v.classList.toggle('active',k===i));
+    cp.forEach((c,k)=>c.classList.toggle('active',k===i));
+    dots.forEach((d,k)=>d.classList.toggle('on',k===i));
+    sc.querySelector('#sIdx').textContent=String(i+1).padStart(2,'0'); }
+  function play(){ if(RM||!live) return; clearInterval(timer); timer=setInterval(()=>show(i+1),5200); }
+  function stop(){ clearInterval(timer); }
+  sc.querySelector('#sNext').onclick=()=>{show(i+1);play();};
+  sc.querySelector('#sPrev').onclick=()=>{show(i-1);play();};
+  dots.forEach(d=>d.onclick=()=>{show(+d.dataset.i);play();});
+  sc.addEventListener('mouseenter',stop); sc.addEventListener('mouseleave',play);
+  new IntersectionObserver(es=>es.forEach(e=>{ live=e.isIntersecting; if(live){show(i);play();} else stop(); }),{threshold:.3}).observe(sc);
+})();
 
 /* scroll reveals */
 if('IntersectionObserver' in window){const io=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}}),{threshold:.12});
