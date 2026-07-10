@@ -417,9 +417,17 @@
       </div>
     </div>
     <form id="inqForm" class="reveal" onsubmit="return submitInquiry(event)">
+      <input type="hidden" name="access_key" value="6f8110a7-bdf7-413d-807c-d56920fef385">
+      <input type="hidden" name="subject" value="New inquiry via blkprint.net">
+      <input type="hidden" name="from_name" value="blkprint.net website">
+      <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" style="display:none" aria-hidden="true">
       <div class="row">
         <div><label>Your name</label><input required name="name" placeholder="Jane Doe"></div>
         <div><label>Business name</label><input required name="business" placeholder="Acme Tiles"></div>
+      </div>
+      <div class="row">
+        <div><label>Email</label><input required type="email" name="email" placeholder="you@business.com"></div>
+        <div><label>Phone / WhatsApp <span style="text-transform:none;letter-spacing:0;opacity:.55">(optional)</span></label><input name="phone" placeholder="+971 …"></div>
       </div>
       <div><label>Current website (if any)</label><input name="url" placeholder="example.com — leave blank if none"></div>
       <div class="row">
@@ -432,7 +440,7 @@
       </div>
       <div><label>Anything else</label><textarea name="details" rows="3" placeholder="What are you trying to achieve?"></textarea></div>
       <button class="btn ink" type="submit" style="justify-content:center">Send inquiry <svg class="ic"><use href="#i-arr"/></svg></button>
-      <p class="note">↳ Sends to hello@blkprint.net. (Wire to Formspree/Supabase for an inbox — see code comment.)</p>
+      <p class="note">↳ Goes straight to our inbox. We reply within one business day — no spam, ever.</p>
     </form>
   </div>
 </section>
@@ -499,12 +507,26 @@ document.querySelectorAll('[data-wa]').forEach(a=>{
   else a.addEventListener('click',e=>{e.preventDefault();alert("Set your WhatsApp number in the BP config (top of the script).");});
 });
 
-/* inquiry form — composes a structured email (swap for Formspree/Supabase for a real inbox) */
-function submitInquiry(e){
+/* inquiry form → Web3Forms; submissions land in hello@blkprint.net, reply-to = the lead's email */
+async function submitInquiry(e){
   e.preventDefault();
-  const f=e.target, d=Object.fromEntries(new FormData(f).entries());
-  const body=`New inquiry via blkprint.net\n\nName: ${d.name}\nBusiness: ${d.business}\nCurrent site: ${d.url||'—'}\nNeeds: ${d.need}\nBudget: ${d.budget}\nTimeline: ${d.timeline}\nSource: ${d.source||'—'}\n\nDetails:\n${d.details||'—'}`;
-  window.location.href = `mailto:${BP.email}?subject=${encodeURIComponent('New inquiry — '+d.business)}&body=${encodeURIComponent(body)}`;
+  const f=e.target, btn=f.querySelector('button[type=submit]');
+  const biz=(f.elements.business.value||f.elements.name.value||'').trim();
+  f.elements.subject.value = biz ? ('New inquiry — '+biz) : 'New inquiry via blkprint.net';
+  const orig=btn.innerHTML; btn.disabled=true; btn.textContent='Sending…';
+  try{
+    const r=await fetch('https://api.web3forms.com/submit',{method:'POST',body:new FormData(f)});
+    const j=await r.json();
+    if(!j.success) throw new Error(j.message||'send failed');
+    f.innerHTML='<div style="text-align:center;padding:28px 8px;display:grid;gap:14px;justify-items:center">'
+      +'<svg class="ic" style="width:38px;height:38px;color:var(--amber)"><use href="#i-check"/></svg>'
+      +'<h3 style="font-size:1.35rem">Thanks — we’ve got it.</h3>'
+      +'<p style="color:var(--mute);max-width:36ch">We’ll come back to you within one business day with a plan and a free sample.</p></div>';
+  }catch(err){
+    btn.disabled=false; btn.innerHTML=orig;
+    const n=f.querySelector('.note');
+    if(n){ n.textContent='Couldn’t send that just now — please email hello@blkprint.net directly and we’ll pick it up.'; n.style.color='var(--amber)'; }
+  }
   return false;
 }
 
